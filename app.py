@@ -8,6 +8,15 @@ app = Flask(__name__)
 inventory = {}
 next_id = 1
 
+# home- welcome page.
+@app.route("/", methods=["GET"])
+def home():
+    return """
+    <html><head><title> Home - inventory management API</title></head>
+    
+    <h1> Welcome to inventory management project</h1></html>"""
+
+
 # CREATE - Add new inventory item
 @app.route("/inventory", methods=["POST"])
 def create_item():
