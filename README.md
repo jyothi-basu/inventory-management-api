@@ -1,8 +1,8 @@
 # Inventory Management API
 
-A structured REST API built using Flask to manage inventory items.
+A structured REST API built using Flask and MySQL to manage inventory items.
 
-This project implements CRUD operations with validation, business rules, and a layered backend architecture.
+This project implements full CRUD operations with validation, business rules, and a clean layered backend architecture.
 
 ---
 
@@ -11,11 +11,12 @@ This project implements CRUD operations with validation, business rules, and a l
 * Create inventory items
 * Get all items
 * Get item by ID
-* Update item name and quantity
+* Update item name and quantity (partial updates supported)
 * Delete item (only if quantity is 0)
-* Input validation
+* Input validation (fields, types, constraints)
 * Proper HTTP status codes
-* Layered architecture
+* MySQL database integration
+* Layered architecture (routes, service, storage)
 
 ---
 
@@ -23,6 +24,8 @@ This project implements CRUD operations with validation, business rules, and a l
 
 * Python 3.12.3
 * Flask
+* MySQL
+* mysql-connector-python
 * Virtual environment (venv)
 
 ---
@@ -35,7 +38,7 @@ inventory_management_api/
 ---- **init**.py
 ---- routes.py      (handles HTTP requests)
 ---- service.py     (business logic)
----- storage.py     (data storage)
+---- storage.py     (database operations)
 
 -- inventory_management_api.py  (entry point)
 -- requirements.txt
@@ -75,11 +78,32 @@ pip install -r requirements.txt
 
 ---
 
-5. Run application
+5. Setup MySQL database
+
+Login to MySQL:
+
+mysql -u root -p
+
+Create database:
+
+CREATE DATABASE inventory_management_db;
+USE inventory_management_db;
+
+Create table:
+
+CREATE TABLE items (
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(255) NOT NULL UNIQUE,
+quantity INT NOT NULL
+);
+
+---
+
+6. Run application
 
 python inventory_management_api.py
 
-Server runs at
+Server runs at:
 http://127.0.0.1:5000/
 
 ---
@@ -122,17 +146,20 @@ Delete item
 DELETE /inventory/<item_id>
 
 Condition
-Item must exist
-Quantity must be 0
+
+* Item must exist
+* Quantity must be 0
 
 ---
 
 ## Validation Rules
 
-* Name must be non-empty string
-* Quantity must be non-negative integer
+* Only allowed fields: name, quantity
+* Name must be a non-empty string
+* Item name must be unique (duplicate entries are not allowed. Duplicate item creation returns 409 Conflict)
+* Quantity must be a non-negative integer
+* Invalid fields are rejected
 * Request body must be valid JSON
-* Cannot delete item if quantity > 0
 
 ---
 
@@ -150,37 +177,38 @@ Quantity must be 0
 ## Architecture
 
 Routes layer
-Handles HTTP requests and validation
+Handles HTTP requests and basic validation
 
 Service layer
-Handles business logic
+Handles business logic and rules
 
 Storage layer
-Handles data storage
+Handles database queries (MySQL)
 
 ---
 
 ## Current Limitations
 
-* Data stored in memory
-* Data resets on server restart
 * No authentication system
+* Single-user system (no roles/permissions)
+* No deployment (runs locally)
 
 ---
 
 ## Next Improvements
 
-* Add database (SQLite, PostgreSQL)
-* Add authentication (admin and user roles)
-* Add persistent storage
-* Add tests
+* Add authentication (admin/user roles)
+* Deploy API (Render / cloud)
+* Add database migrations
+* Add automated tests
 
 ---
 
 ## Notes
 
-* venv, **pycache**, and .pyc files are ignored
-* client.http is used for API testing
+* Sensitive data like database password should not be committed
+* Use environment variables for credentials (recommended)
+* client.http can be used for API testing
 
 ---
 

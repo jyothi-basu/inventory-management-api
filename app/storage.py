@@ -1,43 +1,66 @@
 # Inventory data storage
-inventory = {}
-next_id = 1
+import mysql.connector
+
+connection = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="your_password",
+    database="inventory_management_db"
+)
+
+cursor = connection.cursor(dictionary=True)
+
 
 # create new item:
 def create_item(name, quantity):
-    global next_id
+    query = "INSERT INTO items (name, quantity) VALUES (%s, %s)"
 
-    item = {
-        "id": next_id,
+    cursor.execute(query, (name, quantity))
+    connection.commit()
+
+    return {
+        "id": cursor.lastrowid,
         "name": name,
         "quantity": quantity
     }
 
-    inventory[next_id] = item
-    next_id += 1
-    return item
 
 # Get a specific item:
 def get_item(item_id):
-    item = inventory.get(item_id)
-    return item
+    query = "SELECT * FROM items WHERE id = %s"
+    cursor.execute(query, (item_id,))
+    return cursor.fetchone()
+
 
 # Get all items:
 def get_inventory():
-    return list(inventory.values())
+    query = "SELECT * FROM items"
+    cursor.execute(query)
+    return cursor.fetchall()
 
 
 # Update item:
-def update_item(item_id, updates):
-    item = inventory.get(item_id)
+def update_item(item_id, data):
+    fields = []
+    values = []
 
-    if not item:
-        return None
+    for key in data.keys():
+        fields.append(f"{key} = %s")
+        values.append(data[key])
 
-    item.update(updates)
-    return item
+    values.append(item_id)
+    query = f"UPDATE items SET {', '.join(fields)} WHERE id = %s"
+    cursor.execute(query, tuple(values))
+    connection.commit()
+    return get_item(item_id)
+
+
+
+
 
 
 # Delete item:
 def delete_item(item_id):
-    return inventory.pop(item_id, None)
-    return ""
+    query = "DELETE FROM items WHERE id = %s"
+    cursor.execute(query, (item_id))
+    connection.commit()

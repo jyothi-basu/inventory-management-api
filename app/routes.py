@@ -48,12 +48,11 @@ def update_item(item_id):
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
-    if "name" in data or not isinstance(data["name"], str):
+    if "name" in data and not isinstance(data["name"], str):
         return jsonify({"error": "Name must be string."}), 400
 
-    if "quantity" in data or not isinstance(data["quantity"], int):
+    if "quantity" in data and not isinstance(data["quantity"], int):
         return jsonify({"error": "Quantity must be integer"}), 400
-
     result, status = service.update_item(item_id, data)
     return jsonify(result), status
 
@@ -62,4 +61,8 @@ def update_item(item_id):
 @app.route("/inventory/<int:item_id>", methods=["DELETE"])
 def delete_item(item_id):
     result, status = service.delete_item(item_id)
+
+    if status == 204:
+        return "", 204
+
     return jsonify(result), status
