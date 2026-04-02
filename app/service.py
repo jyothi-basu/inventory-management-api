@@ -1,15 +1,28 @@
 from app import storage
+from mysql.connector import errors
 
 # Create new item:
+
 def create_item(data):
+    allowed_fields = ["name", "quantity"]
+
+    for key in data.keys():
+        if key not in allowed_fields:
+            return {"error": f"Invalid field: {key}"}, 400
+
     if data["name"].strip() == "":
         return {"error": "Name cannot be empty"}, 400
 
     if data["quantity"] < 0:
         return {"error": "Quantity cannot be negative"}, 400
 
-    item = storage.create_item(data["name"], data["quantity"])
-    return item, 201
+    try:
+        item = storage.create_item(data["name"], data["quantity"])
+        return item, 201
+
+    except errors.IntegrityError:
+        return {"error": "Item with this name already exists"}, 409
+
 
 # Get specific item:
 def get_item(item_id):
@@ -33,6 +46,12 @@ def update_item(item_id, data):
     if not item:
         return {"error": "Item not found"}, 404
 
+    allowed_fields = ["name", "quantity"]
+
+    for key in data.keys():
+        if key not in allowed_fields:
+            return {"error": f"Invalid field: {key}"}, 400
+
     if "name" in data:
         if data["name"].strip() == "":
             return {"error": "Invalid name"}, 400
@@ -52,10 +71,10 @@ def delete_item(item_id):
     if not item:
         return {"error": "Item not found."}, 404
 
-    if item[item_id]["quantity"] > 0:
+    if item["quantity"] > 0:
         return {
             "error": "Cannot delete item with remaining quantity",
-            "current_quantity": item[item_id]["quantity"]
+            "current_quantity": item["quantity"]
         }, 409
 
     storage.delete_item(item_id)
