@@ -1,214 +1,238 @@
 # Inventory Management API
 
-A structured REST API built using Flask and MySQL to manage inventory items.
+A production-style REST API built using Flask and MySQL for managing inventory items, with secure authentication and route protection. Built and debugged in a Linux (WSL) environment with real-world deployment-style setup.
 
-This project implements full CRUD operations with validation, business rules, and a clean layered backend architecture.
+This project demonstrates backend engineering concepts including layered architecture, validation, authentication, and debugging.
 
 ---
 
 ## Features
 
-* Create inventory items
-* Get all items
-* Get item by ID
-* Update item name and quantity (partial updates supported)
-* Delete item (only if quantity is 0)
-* Input validation (fields, types, constraints)
-* Proper HTTP status codes
-* MySQL database integration
-* Layered architecture (routes, service, storage)
+### Inventory Management
+- Create inventory items
+- Get all items
+- Get item by ID
+- Update item (partial updates supported)
+- Delete item (only if quantity is 0)
+
+### Authentication & Security
+- User signup with password hashing (bcrypt)
+- User login with credential verification
+- JWT-based authentication
+- Protected routes using token validation
+- Secure password storage (no plain text passwords)
+
+### System Design
+- Layered architecture (Routes → Service → Storage)
+- Input validation and error handling
+- Proper HTTP status codes
+- MySQL database integration
 
 ---
 
 ## Tech Stack
 
-* Python 3.12.3
-* Flask
-* MySQL
-* mysql-connector-python
-* Virtual environment (venv)
+- Python 3.12
+- Flask
+- MySQL
+- mysql-connector-python
+- bcrypt
+- PyJWT
+- Gunicorn
 
 ---
 
 ## Project Structure
-
 inventory_management_api/
-
--- app/
----- **init**.py
----- routes.py      (handles HTTP requests)
----- service.py     (business logic)
----- storage.py     (database operations)
-
--- inventory_management_api.py  (entry point)
--- requirements.txt
--- .gitignore
--- README.md
+inventory_management_api.py
+schema.sql
+requirements.txt
+README.md
+.gitignore
+app/
+init.py
+routes.py
+auth.py
+decorators.py
+service.py
+storage.py
 
 ---
 
 ## Setup Instructions
 
-1. Clone repository
-
+### 1. Clone repository
 git clone https://github.com/jyothi-basu/inventory-management-api.git
 cd inventory-management-api
 
 ---
 
-2. Create virtual environment
-
+### 2. Create virtual environment
 python3 -m venv venv
-
----
-
-3. Activate environment
-
-Windows
-venv\Scripts\activate
-
-Linux / macOS / WSL
 source venv/bin/activate
 
 ---
 
-4. Install dependencies
-
+### 3. Install dependencies
 pip install -r requirements.txt
 
 ---
 
-5. Setup MySQL database
+### 4. Set environment variables
+export SECRET_KEY="your_secret_key"
+export DB_PASSWORD="your_db_password"
 
-Login to MySQL:
-
-mysql -u root -p
-
-Create database:
-
-CREATE DATABASE inventory_management_db;
-USE inventory_management_db;
-
-Create table:
-
-CREATE TABLE items (
-id INT AUTO_INCREMENT PRIMARY KEY,
-name VARCHAR(255) NOT NULL UNIQUE,
-quantity INT NOT NULL
-);
+> DB_PASSWORD is used for MySQL connection in the storage layer.
 
 ---
 
-6. Run application
+### 5. Setup database
+mysql -u root -p < schema.sql
 
-python inventory_management_api.py
+---
+
+### 6. Run application
+
+#### Development
+export FLASK_APP=inventory_management_api.py
+flask run
+
+
+#### Production-style (recommended)
+gunicorn -w 4 -b 127.0.0.1:5000 inventory_management_api:app
+
+---
 
 Server runs at:
 http://127.0.0.1:5000/
 
 ---
 
+## Authentication Flow
+
+1. User signs up → password is hashed using bcrypt  
+2. User logs in → password is verified  
+3. Server generates JWT token  
+4. Client sends token in header:
+Authorization: Bearer <token>
+
+5. Protected routes validate token before execution  
+
+---
+
 ## API Endpoints
 
-Create item
-POST /inventory
+### Authentication
 
-Body
+**POST /signup**
 {
-"name": "Keyboard",
-"quantity": 10
+"name": "User",
+"email": "user@gmail.com",
+"password": "password123"
 }
 
 ---
 
-Get all items
-GET /inventory
-
----
-
-Get item by ID
-GET /inventory/<item_id>
-
----
-
-Update item
-PUT /inventory/<item_id>
-
-Body (partial or full)
+**POST /login**
 {
-"name": "Mouse",
-"quantity": 5
+"email": "user@gmail.com",
+"password": "password123"
 }
 
+Returns JWT token.
+
 ---
 
-Delete item
-DELETE /inventory/<item_id>
+### Inventory (Protected Routes)
 
-Condition
+All routes require:
+Authorization: Bearer <token>
 
-* Item must exist
-* Quantity must be 0
+---
+
+**POST /inventory**  
+Create item  
+
+---
+
+**GET /inventory**  
+Get all items  
+
+---
+
+**GET /inventory/<id>**  
+Get item by ID  
+
+---
+
+**PUT /inventory/<id>**  
+Update item  
+
+---
+
+**DELETE /inventory/<id>**  
+Delete item (only if quantity = 0)  
 
 ---
 
 ## Validation Rules
 
-* Only allowed fields: name, quantity
-* Name must be a non-empty string
-* Item name must be unique (duplicate entries are not allowed. Duplicate item creation returns 409 Conflict)
-* Quantity must be a non-negative integer
-* Invalid fields are rejected
-* Request body must be valid JSON
+- Name must be a non-empty string  
+- Email must be unique  
+- Password must be non-empty  
+- Quantity must be a non-negative integer  
+- Invalid fields are rejected  
 
 ---
 
 ## HTTP Status Codes
 
-200 OK
-201 Created
-204 No Content
-400 Bad Request
-404 Not Found
-409 Conflict
+- 200 OK  
+- 201 Created  
+- 204 No Content  
+- 400 Bad Request  
+- 401 Unauthorized  
+- 404 Not Found  
+- 409 Conflict  
 
 ---
 
 ## Architecture
 
-Routes layer
-Handles HTTP requests and basic validation
-
-Service layer
-Handles business logic and rules
-
-Storage layer
-Handles database queries (MySQL)
+- Routes layer → handles HTTP requests  
+- Service layer → business logic & authentication  
+- Storage layer → database operations  
 
 ---
 
-## Current Limitations
+## .gitignore
 
-* No authentication system
-* Single-user system (no roles/permissions)
-* No deployment (runs locally)
+The project uses a Python-based `.gitignore` to exclude:
+
+- `venv/` (virtual environment)
+- `__pycache__/` (compiled Python files)
+- local testing files (e.g., client.http )
+- environment-specific files
+
+This ensures sensitive and unnecessary files are not committed.
 
 ---
 
-## Next Improvements
+## Future Improvements
 
-* Add authentication (admin/user roles)
-* Deploy API (Render / cloud)
-* Add database migrations
-* Add automated tests
+- Role-based authorization (admin/user)
+- Deployment (Render / VPS)
+- Database migrations
+- Automated testing
 
 ---
 
 ## Notes
 
-* Sensitive data like database password should not be committed
-* Use environment variables for credentials (recommended)
-* client.http can be used for API testing
+- Environment variables are used for sensitive data
+- Database credentials are not stored in code
+- Tested using REST client
+- Developed and tested in WSL environment
 
 ---
 
@@ -220,4 +244,4 @@ Jyothi Basu
 
 ## License
 
-This project is created for learning and skill development.
+This project is created for learning and demonstration purposes.

@@ -1,6 +1,7 @@
 from flask import jsonify, request
 from app import app
 from app import service
+from app.decoraters import token_required
 
 # Welcome page:
 @app.route("/", methods=["GET"])
@@ -10,6 +11,7 @@ def home():
 
 # Add new inventory item:
 @app.route("/inventory", methods=["POST"])
+@token_required
 def create_item():
     data = request.json
 
@@ -28,20 +30,23 @@ def create_item():
 
 # Get specific item:
 @app.route("/inventory/<int:item_id>", methods=["GET"])
+@token_required
 def get_item(item_id):
     result, status = service.get_item(item_id)
     return jsonify(result), status
 
 
-# Get all items:
+#  Get all items:
 @app.route("/inventory", methods=["GET"])
+@token_required
 def get_inventory():
     result, status = service.get_inventory()
     return jsonify(result), status
 
 
-# Update item quantity:
+# Update inventory:
 @app.route("/inventory/<int:item_id>", methods=["PUT"])
+@token_required
 def update_item(item_id):
     data = request.json
 
@@ -59,6 +64,7 @@ def update_item(item_id):
 
 # DELETE - Remove item (only if quantity is 0)
 @app.route("/inventory/<int:item_id>", methods=["DELETE"])
+@token_required
 def delete_item(item_id):
     result, status = service.delete_item(item_id)
 
