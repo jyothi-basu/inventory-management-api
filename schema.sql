@@ -1,16 +1,12 @@
--- Create database
-CREATE DATABASE IF NOT EXISTS inventory_management_db;
-USE inventory_management_db;
-
 -- Items table
-CREATE TABLE items (
+CREATE TABLE IF NOT EXISTS items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
     quantity INT NOT NULL
 );
 
 -- Users table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,

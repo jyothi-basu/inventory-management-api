@@ -2,15 +2,22 @@
 import mysql.connector
 import os
 
-# Database password:
-DB_PASSWORD = os.getenv("DB_PASSWORD")
+def get_required_env(name):
+    value = os.getenv(name)
+
+    if not value:
+        raise RuntimeError(f"{name} environment variable is required")
+
+    return value
+
 # create connection function
 def get_db_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password= DB_PASSWORD,
-        database="inventory_management_db"
+        host=get_required_env("DB_HOST"),
+        user=get_required_env("DB_USER"),
+        password=get_required_env("DB_PASSWORD"),
+        database=get_required_env("DB_NAME"),
+        port=int(os.getenv("DB_PORT", 3306))
     )
 
 

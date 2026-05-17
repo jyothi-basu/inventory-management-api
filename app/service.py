@@ -4,6 +4,14 @@ import bcrypt
 import jwt
 import os
 
+def get_required_env(name):
+    value = os.getenv(name)
+
+    if not value:
+        raise RuntimeError(f"{name} environment variable is required")
+
+    return value
+
 # Create new item:
 
 def create_item(data):
@@ -129,7 +137,7 @@ def login(data):
         "user_email": user["email"]
     }
 
-    SECRET_KEY = os.getenv("SECRET_KEY")
+    SECRET_KEY = get_required_env("SECRET_KEY")
     token = jwt.encode(user_info, SECRET_KEY, algorithm="HS256")
 
     if isinstance(token, bytes):
