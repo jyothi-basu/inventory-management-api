@@ -42,6 +42,12 @@ This project demonstrates backend engineering concepts including layered archite
 
 ---
 
+## Live API
+
+Deployment pending.
+
+---
+
 ## Project Structure
 inventory_management_api/
 inventory_management_api.py
@@ -49,11 +55,12 @@ schema.sql
 requirements.txt
 README.md
 .gitignore
+.env.example
 app/
-init.py
+__init__.py
 routes.py
 auth.py
-decorators.py
+decoraters.py
 service.py
 storage.py
 
@@ -80,14 +87,22 @@ pip install -r requirements.txt
 
 ### 4. Set environment variables
 export SECRET_KEY="your_secret_key"
-export DB_PASSWORD="your_db_password"
+export DB_HOST="localhost"
+export DB_USER="your_database_user"
+export DB_PASSWORD="your_database_password"
+export DB_NAME="inventory_management_db"
+export DB_PORT="3306"
 
-> DB_PASSWORD is used for MySQL connection in the storage layer.
+The required variables are also documented in `.env.example`.
+
+> Do not commit a real `.env` file. It may contain database credentials and secret keys.
 
 ---
 
 ### 5. Setup database
-mysql -u root -p < schema.sql
+Create a MySQL database first, then run the schema inside that database:
+
+mysql -u your_database_user -p your_database_name < schema.sql
 
 ---
 
@@ -105,6 +120,25 @@ gunicorn -w 4 -b 127.0.0.1:5000 inventory_management_api:app
 
 Server runs at:
 http://127.0.0.1:5000/
+
+---
+
+## Deployment Notes
+
+For deployment platforms such as Render, set the same environment variables in the platform dashboard:
+
+- `SECRET_KEY`
+- `DB_HOST`
+- `DB_USER`
+- `DB_PASSWORD`
+- `DB_NAME`
+- `DB_PORT`
+
+Recommended production start command:
+
+gunicorn --bind 0.0.0.0:$PORT inventory_management_api:app
+
+For hosted MySQL databases, run `schema.sql` inside the database provided by the platform.
 
 ---
 
@@ -221,7 +255,7 @@ This ensures sensitive and unnecessary files are not committed.
 ## Future Improvements
 
 - Role-based authorization (admin/user)
-- Deployment (Render / VPS)
+- Deployment link after hosting
 - Database migrations
 - Automated testing
 
