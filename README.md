@@ -1,8 +1,8 @@
 # Inventory Management API
 
-A Flask REST API for managing inventory items with MySQL persistence, JWT authentication, password hashing, protected routes, validation, and a layered backend structure.
+A Flask REST API for managing inventory items with MySQL persistence, JWT authentication, role-based authorization, password hashing, protected routes, validation, and a layered backend structure.
 
-The project was built as a backend learning project and evolved through clear milestones: single-file CRUD, layered architecture, MySQL integration, and authentication with protected routes.
+The project was built as a backend learning project and evolved through clear milestones: single-file CRUD, layered architecture, MySQL integration, authentication with protected routes, deployment, and role-based authorization.
 
 ---
 
@@ -34,6 +34,7 @@ Deployment stack:
 - Password hashing with bcrypt
 - JWT token generation
 - Protected inventory routes
+- Role-based authorization with `admin` and `staff` roles
 - Secure password storage without plain text passwords
 
 ### Backend Design
@@ -188,9 +189,40 @@ For hosted MySQL databases, run `schema.sql` inside the database provided by the
 Authorization: Bearer <token>
 ```
 
-6. Protected routes validate the token before processing the request.
+6. Protected routes validate the token and check the user's role before processing the request.
+
+New users are assigned the `staff` role by default. Admin users should be promoted manually in the database.
 
 Current limitation: JWT tokens do not yet include an expiration time.
+
+---
+
+## Role-Based Authorization
+
+The API uses two roles:
+
+- `admin`
+- `staff`
+
+Recommended admin promotion query:
+
+```sql
+UPDATE users
+SET role = 'admin'
+WHERE email = 'your_email@example.com';
+```
+
+Route permissions:
+
+| Method | Endpoint | Admin | Staff |
+|---|---|---:|---:|
+| `POST` | `/inventory` | Yes | No |
+| `GET` | `/inventory` | Yes | Yes |
+| `GET` | `/inventory/<id>` | Yes | Yes |
+| `PUT` | `/inventory/<id>` | Yes | Yes |
+| `DELETE` | `/inventory/<id>` | Yes | No |
+
+Requests with a missing or invalid token return `401 Unauthorized`. Requests with a valid token but insufficient role permission return `403 Forbidden`.
 
 ---
 
@@ -288,6 +320,7 @@ Example create item request:
 - `204 No Content`
 - `400 Bad Request`
 - `401 Unauthorized`
+- `403 Forbidden`
 - `404 Not Found`
 - `409 Conflict`
 
@@ -322,6 +355,7 @@ MySQL database
 - `v0.3.0`: MySQL database integration
 - `v1.0.0`: JWT authentication and protected inventory routes
 - `v1.1.0`: Deployment configuration and documentation overhaul
+- `v1.2.0`: Role-based authorization with admin and staff permissions
 
 ---
 
@@ -330,13 +364,13 @@ MySQL database
 - Environment variables are used for sensitive configuration.
 - Database credentials are not stored in code.
 - `.env.example` documents required configuration values.
+- New users receive the `staff` role by default.
 - Developed and tested in a Linux/WSL environment.
 
 ---
 
 ## Future Improvements
 
-- Add role-based authorization for admin and normal users
 - Add JWT expiration
 - Add automated tests with pytest
 - Add database migrations

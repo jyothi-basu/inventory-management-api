@@ -134,7 +134,8 @@ def login(data):
     # Generate token:
     user_info = {
         "user_id": user["id"],
-        "user_email": user["email"]
+        "user_email": user["email"],
+        "user_role": user["role"]
     }
 
     SECRET_KEY = get_required_env("SECRET_KEY")
