@@ -40,6 +40,7 @@ Deployment stack:
 ### Backend Design
 - Layered architecture: routes, service, storage, authentication
 - MySQL database integration
+- CORS enabled for browser clients
 - Input validation
 - Error handling with proper HTTP status codes
 - Environment-based configuration for secrets and database credentials
@@ -106,7 +107,7 @@ pip install -r requirements.txt
 
 ### 4. Set Environment Variables
 
-The required variables are documented in `.env.example`.
+The required variables are documented in `.env.example`. For local development, create a `.env` file in the project root with the same keys.
 
 ```bash
 export SECRET_KEY="your_secret_key"
