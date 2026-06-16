@@ -1,0 +1,7 @@
+.codex
+.env
+personal/
+__pycache__/
+venv/
+.git
+*.pyc

@@ -4,6 +4,8 @@ A Flask REST API for managing inventory items with MySQL persistence, JWT authen
 
 The project was built as a backend learning project and evolved through clear milestones: single-file CRUD, layered architecture, MySQL integration, authentication with protected routes, deployment, and role-based authorization.
 
+Current release: `v1.3.0`
+
 ---
 
 ## Live API
@@ -41,6 +43,7 @@ Deployment stack:
 - Layered architecture: routes, service, storage, authentication
 - MySQL database integration
 - CORS enabled for browser clients
+- Dockerized deployment setup
 - Input validation
 - Error handling with proper HTTP status codes
 - Environment-based configuration for secrets and database credentials
@@ -56,6 +59,7 @@ Deployment stack:
 - mysql-connector-python
 - bcrypt
 - PyJWT
+- Docker
 - Gunicorn
 - Git and GitHub
 - Linux/WSL development environment
@@ -70,6 +74,8 @@ inventory-management-api/
 |-- schema.sql
 |-- requirements.txt
 |-- README.md
+|-- Dockerfile
+|-- .dockerignore
 |-- .gitignore
 |-- .env.example
 `-- app/
@@ -149,6 +155,13 @@ Production-style local run:
 gunicorn -w 1 -b 127.0.0.1:5000 inventory_management_api:app
 ```
 
+Docker:
+
+```bash
+docker build -t inventory-management-api .
+docker run -p 5000:5000 --env-file .env inventory-management-api
+```
+
 Local server:
 
 ```text
@@ -173,6 +186,8 @@ Recommended Render start command:
 ```bash
 gunicorn --bind 0.0.0.0:$PORT inventory_management_api:app
 ```
+
+If you deploy with Docker on Render or another platform, the included `Dockerfile` already starts the app with Gunicorn on port `5000`.
 
 For hosted MySQL databases, run `schema.sql` inside the database provided by the hosting platform.
 
@@ -357,6 +372,7 @@ MySQL database
 - `v1.0.0`: JWT authentication and protected inventory routes
 - `v1.1.0`: Deployment configuration and documentation overhaul
 - `v1.2.0`: Role-based authorization with admin and staff permissions
+- `v1.3.0`: Docker support, CORS setup, and README refresh
 
 ---
 
@@ -375,7 +391,6 @@ MySQL database
 - Add JWT expiration
 - Add automated tests with pytest
 - Add database migrations
-- Add Docker-based local setup
 
 ---
 
