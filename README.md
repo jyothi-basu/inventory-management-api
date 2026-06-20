@@ -4,7 +4,7 @@ A Flask REST API for managing inventory items with MySQL persistence, JWT authen
 
 The project was built as a backend learning project and evolved through clear milestones: single-file CRUD, layered architecture, MySQL integration, authentication with protected routes, deployment, and role-based authorization.
 
-Current release: `v1.3.0`
+Current release: `v1.4.0`
 
 ---
 
@@ -43,7 +43,7 @@ Deployment stack:
 - Layered architecture: routes, service, storage, authentication
 - MySQL database integration
 - CORS enabled for browser clients
-- Dockerized deployment setup
+- Docker and Docker Compose setup
 - Input validation
 - Error handling with proper HTTP status codes
 - Environment-based configuration for secrets and database credentials
@@ -60,6 +60,7 @@ Deployment stack:
 - bcrypt
 - PyJWT
 - Docker
+- Docker Compose
 - Gunicorn
 - Git and GitHub
 - Linux/WSL development environment
@@ -76,6 +77,7 @@ inventory-management-api/
 |-- README.md
 |-- Dockerfile
 |-- .dockerignore
+|-- compose.yaml
 |-- .gitignore
 |-- .env.example
 `-- app/
@@ -162,6 +164,12 @@ docker build -t inventory-management-api .
 docker run -p 5000:5000 --env-file .env inventory-management-api
 ```
 
+Docker Compose:
+
+```bash
+docker compose up --build
+```
+
 Local server:
 
 ```text
@@ -188,6 +196,8 @@ gunicorn --bind 0.0.0.0:$PORT inventory_management_api:app
 ```
 
 If you deploy with Docker on Render or another platform, the included `Dockerfile` already starts the app with Gunicorn on port `5000`.
+
+For local development with Docker Compose, the `api` service connects to the `mysql` service using `DB_HOST=mysql` from your `.env` file.
 
 For hosted MySQL databases, run `schema.sql` inside the database provided by the hosting platform.
 
@@ -373,6 +383,7 @@ MySQL database
 - `v1.1.0`: Deployment configuration and documentation overhaul
 - `v1.2.0`: Role-based authorization with admin and staff permissions
 - `v1.3.0`: Docker support, CORS setup, and README refresh
+- `v1.4.0`: Docker Compose support and container startup healthchecks
 
 ---
 
