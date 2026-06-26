@@ -413,4 +413,4 @@ Jyothi Basu
 
 ## License
 
-This project is created for learning and demonstration purposes.
+This project is licensed under the MIT License. See the [LICENSE](/home/jyothi-basu/projects/inventory-management-api/LICENSE) file for details.
